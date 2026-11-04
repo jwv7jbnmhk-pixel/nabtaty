@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="نبتتي: تطبيق لتنظيم معلومات النباتات ومتابعة العناية بها."><meta name="theme-color" content="#286447">
+<title>نبتتي | اهتم بنبتتك</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar"><a class="brand" href="#home">🌿 نبتتي</a><span class="tagline">اهتم بنبتتك، ودعها تزدهر</span></header>
+<main class="container">
+<section id="home" class="screen welcome"><div class="leaf-deco">🌿</div><div class="logo-plant">🪴</div><h1>نبتتي</h1><p>اهتم بنبتتك، ودعها تزدهر</p><button class="button primary wide" id="startBtn">ابدأ الآن</button></section>
+<section id="collection" class="screen hidden"><div class="section-heading"><div><h2>نباتاتي</h2><p>كل نباتاتك وبيانات العناية بها في مكان واحد.</p></div><button class="button primary" id="addPlantBtn">＋ إضافة نبتة</button></div><div id="plantGrid" class="plant-grid"></div><div class="note">تختلف احتياجات النباتات حسب النوع والبيئة؛ أدخلي بيانات موثوقة تناسب نبتتك.</div></section>
+<section id="editor" class="screen hidden"><div class="page-heading"><button class="back" data-go="collection">‹</button><h2 id="editorTitle">إضافة نبتة</h2></div><form id="plantForm"><input type="hidden" id="plantId"><div class="photo-picker"><div id="photoPreview" class="photo-preview">🪴</div><label class="button secondary file-label">📷 إضافة صورة<input id="plantPhoto" type="file" accept="image/*"></label></div>
+<label>اسم النبتة<input id="plantName" maxlength="50" required placeholder="مثال: فيكس"></label>
+<label>نوع النبتة<input id="plantType" maxlength="50" placeholder="مثال: داخلي"></label>
+<label>العمر<input id="plantAge" maxlength="40" placeholder="مثال: سنة واحدة"></label>
+<div class="form-actions"><button class="button primary wide" type="submit">التالي</button></div></form></section>
+<section id="careEntry" class="screen hidden"><div class="page-heading"><button class="back" data-go="editor">‹</button><h2>بيانات العناية</h2></div><form id="careForm">
+<label>درجة الحرارة المناسبة<input id="plantTemp" maxlength="40" placeholder="مثال: 18–25°م"></label>
+<label>كمية الماء<input id="plantWater" maxlength="40" placeholder="مثال: 200 مل"></label>
+<label>عدد مرات الري<input id="plantWatering" maxlength="60" placeholder="مثال: كل 3 أيام"></label>
+<label>الإضاءة<input id="plantLight" maxlength="60" placeholder="مثال: ضوء غير مباشر"></label>
+<label>السماد<input id="plantFertilizer" maxlength="60" placeholder="مثال: مرة كل أسبوعين"></label>
+<label>نوع التربة<input id="plantSoil" maxlength="60" placeholder="مثال: تربة جيدة التصريف"></label>
+<label>ملاحظات<textarea id="plantNotes" rows="2" maxlength="300" placeholder="ملاحظات إضافية..."></textarea></label>
+<button class="button primary wide" type="submit">حفظ البيانات</button></form></section>
+<section id="needs" class="screen hidden"><div class="page-heading"><button class="back" data-go="collection">‹</button><h2>احتياجات نبتتي</h2></div><div id="needsContent"></div><button class="button primary wide" id="showPlan">عرض خطة العناية</button></section>
+<section id="plan" class="screen hidden"><div class="page-heading"><button class="back" data-go="needs">‹</button><h2>خطة العناية</h2></div><div id="planContent" class="task-list"></div><button class="button primary wide" id="saveTasks">حفظ التغييرات</button></section>
+<section id="details" class="screen hidden"><div class="page-heading"><button class="back" data-go="collection">‹</button><h2>تفاصيل النبتة</h2></div><div id="detailContent"></div><div class="detail-actions"><button class="button danger" id="deletePlant">حذف النبتة</button><button class="button primary" id="editPlant">✎ تعديل البيانات</button></div></section>
+</main><footer>© <span id="year"></span> نبتتي — مشروع تعليمي</footer><script src="app.js"></script>
+</body></html>

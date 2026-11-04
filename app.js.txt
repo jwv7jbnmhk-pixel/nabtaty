@@ -1,0 +1,25 @@
+const KEY='nabtati-plants-v2';
+const $=id=>document.getElementById(id);
+let plants=load(),currentId=null,draftPhoto='';
+function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return[]}}
+function save(){localStorage.setItem(KEY,JSON.stringify(plants))}
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function current(){return plants.find(p=>p.id===currentId)}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));$(id).classList.remove('hidden');window.scrollTo(0,0)}
+function image(p){return p.photo?`<img src="${p.photo}" alt="صورة ${esc(p.name)}">`:'<span>🪴</span>'}
+function fields(p){return [['درجة الحرارة',p.temp,'🌡️'],['كمية الماء',p.water,'💧'],['عدد مرات الري',p.watering,'▦'],['الإضاءة',p.light,'☀️'],['السماد',p.fertilizer,'🌿'],['نوع التربة',p.soil,'🪴']]}
+function render(){const grid=$('plantGrid');if(!plants.length){grid.innerHTML='<div class="empty">🌱<strong>لم تضيفي أي نبتة بعد</strong><p>ابدئي بإضافة نبتتك الأولى.</p></div>';return}grid.innerHTML=plants.map(p=>`<button class="plant-card" data-open="${p.id}"><div class="plant-thumb">${image(p)}</div><div><strong>${esc(p.name)}</strong><small>${esc(p.type||'نوع غير محدد')} · ${esc(p.age||'العمر غير محدد')}</small><span class="open-label">عرض التفاصيل ←</span></div></button>`).join('')}
+function clearEditor(){['plantId','plantName','plantType','plantAge','plantTemp','plantWater','plantWatering','plantLight','plantFertilizer','plantSoil','plantNotes'].forEach(id=>$(id).value='');draftPhoto='';$('photoPreview').innerHTML='🪴'}
+function newPlant(){currentId=null;clearEditor();$('editorTitle').textContent='إضافة نبتة';show('editor')}
+function editPlant(){const p=current();if(!p)return;clearEditor();$('editorTitle').textContent='تعديل بيانات النبتة';$('plantId').value=p.id;$('plantName').value=p.name||'';$('plantType').value=p.type||'';$('plantAge').value=p.age||'';['Temp','Water','Watering','Light','Fertilizer','Soil','Notes'].forEach(k=>$('plant'+k).value=p[k.toLowerCase()]||'');draftPhoto=p.photo||'';$('photoPreview').innerHTML=image(p);show('editor')}
+$('startBtn').onclick=()=>{render();show('collection')};$('addPlantBtn').onclick=newPlant;
+document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.go));
+$('plantPhoto').onchange=e=>{const f=e.target.files[0];if(!f)return;if(f.size>1200000){alert('حجم الصورة كبير؛ اختاري صورة أقل من 1.2 ميجابايت.');e.target.value='';return}const r=new FileReader();r.onload=()=>{draftPhoto=r.result;$('photoPreview').innerHTML=`<img src="${draftPhoto}" alt="معاينة الصورة">`};r.readAsDataURL(f)};
+$('plantForm').onsubmit=e=>{e.preventDefault();if(!$('plantName').value.trim())return;show('careEntry')};
+$('careForm').onsubmit=e=>{e.preventDefault();const id=$('plantId').value||String(Date.now());const p={id,name:$('plantName').value.trim(),type:$('plantType').value.trim(),age:$('plantAge').value.trim(),photo:draftPhoto};['Temp','Water','Watering','Light','Fertilizer','Soil','Notes'].forEach(k=>p[k.toLowerCase()]=$('plant'+k).value.trim());if(currentId&&currentId!==id){}const index=plants.findIndex(x=>x.id===id);if(index>=0)plants[index]=p;else plants.unshift(p);currentId=id;save();render();showNeeds();};
+function showNeeds(){const p=current();if(!p)return;$('needsContent').innerHTML=`<div class="summary-card"><div class="plant-thumb">${image(p)}</div><div><strong>${esc(p.name)}</strong><small>${esc(p.type||'')} · ${esc(p.age||'')}</small></div></div><h3>ملخص الاحتياجات</h3><div class="data-list">${fields(p).map(([l,v,i])=>`<div><span>${l}</span><strong>${esc(v||'لم يُحدد')}</strong><b>${i}</b></div>`).join('')}</div>`;show('needs')}
+$('showPlan').onclick=()=>{const p=current();const tasks=[['ري النبتة',p?.watering],['فحص التربة','كل أسبوع'],['التأكد من الإضاءة','يوميًا'],['موعد التسميد',p?.fertilizer]];$('planContent').innerHTML=tasks.map(([a,b],i)=>`<label class="task"><input type="checkbox" data-task="${i}" ${p?.tasks?.[i]?'checked':''}><span><strong>${a}</strong><small>${esc(b||'حسب الحاجة')}</small></span></label>`).join('');show('plan')};
+$('saveTasks').onclick=()=>{const p=current();if(p){p.tasks=[...document.querySelectorAll('[data-task]')].map(x=>x.checked);save()}show('details');renderDetails()};
+function renderDetails(){const p=current();if(!p)return;$('detailContent').innerHTML=`<div class="detail-hero">${image(p)}<h3>${esc(p.name)}</h3><p>${esc(p.type||'نوع غير محدد')} · العمر: ${esc(p.age||'غير محدد')}</p></div><h3>جميع البيانات</h3><div class="data-list">${fields(p).map(([l,v,i])=>`<div><span>${l}</span><strong>${esc(v||'لم يُحدد')}</strong><b>${i}</b></div>`).join('')}</div>${p.notes?`<p class="note">${esc(p.notes)}</p>`:''}`}
+$('plantGrid').onclick=e=>{const b=e.target.closest('[data-open]');if(!b)return;currentId=b.dataset.open;renderDetails();show('details')};$('editPlant').onclick=editPlant;$('deletePlant').onclick=()=>{const p=current();if(p&&confirm(`هل تريدين حذف ${p.name}؟`)){plants=plants.filter(x=>x.id!==p.id);save();render();show('collection')}};
+$('year').textContent=new Date().getFullYear();render();
